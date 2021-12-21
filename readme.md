@@ -113,7 +113,7 @@ LoadModule php_module /usr/lib/httpd/modules/libphp.so
 
 #### 项目配置
 
-配置项位于：`includes\common.php`，此文件包含本项目用到的全局变量。
+配置项位于：`includes\config.php`，此文件包含本项目用到的全局变量。
 
 ##### 数据库连接部分：
 
@@ -128,7 +128,7 @@ static $DEFAULT_DB_USER = "database user name";
 
 ##### 修改tag以及其他不安全字符过滤规则：
 
-修改`includes\common.php`中的 `$allowd_tags` 以及 `$disallowed`，其中：
+修改`includes\config.php`中的 `$allowd_tags` 以及 `$disallowed`，其中：
 
 * `$allowd_tags`： 允许出现在profile中的tag；
 * `$disallowd`：不允许出现的字符，会被替换为空格字符`" "`；

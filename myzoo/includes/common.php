@@ -6,15 +6,16 @@ require_once "database.class.php";
 require_once "login.php";
 require_once "userAuth.php";
 require_once "navigation.php";
+require_once "config.php";
 
 // Allow users to use the back button without reposting data
 header("Cache-Control: private");
 
 // 数据库连接部分
-static $DEFAULT_DB_NAME = "myzoo";
-static $DEFAULT_DB_HOST = "localhost";
-static $DEFAULT_DB_PASSWD = "913913";
-static $DEFAULT_DB_USER = "niss";
+global $DEFAULT_DB_NAME;
+global $DEFAULT_DB_HOST;
+global $DEFAULT_DB_PASSWD;
+global $DEFAULT_DB_USER;
 
 // 全局数据库连接
 $db = new Database($DEFAULT_DB_HOST
@@ -45,29 +46,16 @@ $user = new UserAuth($db);
  * 不安全的过滤
  *
  */
-$allowed_tags =
-    '<script><a><br><b><h1><h2><h3><h4>'.
-    '<i><img><li><ol><p><strong><table>' .
-    '<tr><td><th><u><ul><em><span>';
+global $allowed_tags;
 
-$disallowed =
-    'eval|setTimeout|setInterval|target|'.
-    'onAbort|onBlur|onChange|onClick|onDblClick|'.
-    'onDragDrop|onFocus|onKeyDown|onKeyPress|'.
-    'onKeyUp|onLoad|onMouseDown|onMouseMove|onMouseOut|'.
-    'onMouseOver|onMouseUp|onMove|onReset|onResize|'.
-    'onSelect|onSubmit|onUnload';
+global $disallowed;
 /**
  *
  */
 
 
-$ENABLE_HTTP_REFER_CHECK = false;
-$ENABLE_TOKEN_CHECK = false;
-
-
-
-
+global $ENABLE_HTTP_REFER_CHECK;
+global $ENABLE_TOKEN_CHECK;
 
 
 // Check for logout and maybe display login page
