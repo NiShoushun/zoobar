@@ -166,8 +166,8 @@ $ENABLE_TOCKEN_CHECK = true;
 > CSRF攻击演示需要将检查设为`false`：
 >
 > ```php
-> $ENABLE_HTTPREFER_CHECK = false;
-> $ENABLE_TOCKEN_CHECK = false;
+> $ENABLE_HTTP_REFER_CHECK = false;
+> $ENABLE_TOKEN_CHECK = false;
 > ```
 >
 > XSS攻击演示需要将允许的添加一些tag与关键词；
