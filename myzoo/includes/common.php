@@ -62,8 +62,8 @@ $disallowed =
  */
 
 
-$ENABLE_HTTPREFER_CHECK = true;
-$ENABLE_TOCKEN_CHECK = true;
+$ENABLE_HTTP_REFER_CHECK = false;
+$ENABLE_TOKEN_CHECK = false;
 
 
 

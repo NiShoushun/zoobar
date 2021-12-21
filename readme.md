@@ -163,7 +163,7 @@ $ENABLE_TOCKEN_CHECK = true;
 
 > 注意：
 >
-> CSRF攻击演示需要将检查设为false：
+> CSRF攻击演示需要将检查设为`false`：
 >
 > ```php
 > $ENABLE_HTTPREFER_CHECK = false;
@@ -171,3 +171,5 @@ $ENABLE_TOCKEN_CHECK = true;
 > ```
 >
 > XSS攻击演示需要将允许的添加一些tag与关键词；
+>
+> XSS蠕虫攻击也需要将CSRF检查设为`false`

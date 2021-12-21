@@ -57,9 +57,6 @@ function checkToken(){
     if ($_POST['user_token'] != $userToken) {
         echo $result."<br>";
         echo "   "."<br>";
-        echo "usertok".$userToken."<br>";
-        echo "session".$_SESSION['user_token']."<br>";
-        echo "post".$_POST['user_token']."<br>";
         exit(1);
     }
 }
