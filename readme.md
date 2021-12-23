@@ -18,7 +18,7 @@ web 安全实践实验项目（版本老的都包浆了），对其做了一些�
 
 * 添加 mysqli扩展。
 
-  > 去除`extension mysqli`
+  > 添加`extension mysqli`
 
 ##### httpd/apache服务器配置
 
@@ -38,9 +38,10 @@ web 安全实践实验项目（版本老的都包浆了），对其做了一些�
   ```htaccess
   LoadModule mpm_prefork_module modules/mod_mpm_prefork.so
   ```
+  貌似是为每个HTTP连接创建一个进程/线程？
 
-* 删除模块：
-
+* 删除模块（注释掉）：
+  
   ```htaccess
   LoadModule mpm_event_module modules/mod_mpm_event.so
   ```
