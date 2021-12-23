@@ -139,12 +139,12 @@ static $DEFAULT_DB_USER = "database user name";
 修改：
 
 ```php
-$ENABLE_HTTPREFER_CHECK = true;
-$ENABLE_TOCKEN_CHECK = true;
+$ENABLE_HTTP_REFER_CHECK = true;
+$ENABLE_TOKEN_CHECK = true;
 ```
 
-* `$ENABLE_HTTP_REFERER_CHECK `：若为true，则检查请求来源是否为`/user.php`，不通过验证则php终止服务；
-* `$ENABLE_TOCKEN_CHECK `：若为true，用户访问transfer.php时进行token更新，并于用户提交的token相比较，不通过验证则php终止服务；
+* `$ENABLE_HTTP_REFERER_CHECK `：若为true，则检查请求来源是否为`/transfer.php`，不通过验证则php终止服务；
+* `$ENABLE_TOKEN_CHECK `：若为true，用户访问transfer.php时进行token更新，并于用户提交的token相比较（token被写入到用户表单并不可见），不通过验证则php终止服务；
 
 ### attack服务
 
