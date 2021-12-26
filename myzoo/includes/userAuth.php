@@ -74,6 +74,10 @@ class UserAuth
             // 用户登出后将cookie设为空字符串
             setcookie($this->cookieName,"");
         }
+
+        session_start();
+        // 清空user token
+        session_destroy();
         // 清空当前连接user信息
         $this->id = 0;
         $this->username = null;

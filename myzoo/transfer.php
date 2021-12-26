@@ -8,7 +8,7 @@ nav_start_inner();
 
 
 // 转移结果提示信息
-$result = "nothing to do";
+$resultMsg = "nothing to do";
 
 global $db;
 global $user;
@@ -20,10 +20,10 @@ function setToken(){
     /**
      *  开启一个 session 并添加一个随机 token
      * session 并不会在不同的php页面中共享，需要 session_start() 检索已有的session
-     * Fixme 只能在第一次登陆验证时，才会设置 session
      */
 
-    if (!$_SESSION["user_token"] or $_SESSION["user_token"]==""){
+    // 如果未设置user token
+    if (!isset($_SESSION["user_token"])){
         $_SESSION["user_token"] = md5(uniqid(mt_rand(), true));
     }
 }
@@ -51,11 +51,11 @@ function checkHttpReferer(){
  */
 
 function checkToken(){
-    $result = "Transfer failed: wrong user token.";
+    $resultMsg = "Transfer failed: wrong user token.";
     $userToken = $_SESSION["user_token"];
 
     if ($_POST['user_token'] != $userToken) {
-        echo $result."<br>";
+        echo $resultMsg."<br>";
         echo "   "."<br>";
         exit(1);
     }
@@ -90,7 +90,7 @@ if ($_POST['submission']) {
         $sql = "SELECT Zoobars FROM Person WHERE Username='$recipient'";
         $rs = $db->executeQuery($sql);
         if (!$rs) {
-            $result = "user query error!";
+            $resultMsg = "user query error!";
             return;
         }
         $rsArr = mysqli_fetch_array($rs);
@@ -98,9 +98,9 @@ if ($_POST['submission']) {
         $sql = "UPDATE Person SET Zoobars = $recipient_balance " .
             "WHERE Username='$recipient'";
         $db->executeQuery($sql);
-        $result = $_POST["user_token"];
+        $resultMsg = $_POST["user_token"];
     } else {
-        $result = "Transfer to failed.";
+        $resultMsg = "Transfer to failed.";
     }
 }
 ?>
@@ -123,9 +123,7 @@ if ($_POST['submission']) {
 
     <!--    zoobar 数量-->
     <p>Send
-        <input name=zoobars type=text value="<?php
-        echo $_POST['zoobars'];
-        ?>" size=5>zoobars
+        <input name=zoobars type=text value="<?php echo $_POST['zoobars']; ?>" size=5>zoobars
     </p>
 
     <!--  默认包含 user_token，且不显示，token从该用户本次连接session中获取-->

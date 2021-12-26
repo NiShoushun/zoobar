@@ -26,41 +26,20 @@ $db = new Database($DEFAULT_DB_HOST
 // 全局用户
 $user = new UserAuth($db);
 
-/**
- * 正常的过滤
 
-    $allowed_tags =
-        '<a><br><b><h1><h2><h3><h4><i><img><li><ol><p><strong><table>' .
-        '<tr><td><th><u><ul><em><span>';
-    $disallowed =
-        'javascript:|window|eval|setTimeout|setInterval|target|' .
-        'onAbort|onBlur|onChange|onClick|onDblClick|' .
-        'onDragDrop|onError|onFocus|onKeyDown|onKeyPress|' .
-        'onKeyUp|onLoad|onMouseDown|onMouseMove|onMouseOut|' .
-        'onMouseOver|onMouseUp|onMove|onReset|onResize|' .
-        'onSelect|onSubmit|onUnload';
-*/
-
-
-/**
- * 不安全的过滤
- *
- */
 global $allowed_tags;
-
 global $disallowed;
-/**
- *
- */
-
+global $REPLACE_SPACIAL_CHAR;
 
 global $ENABLE_HTTP_REFER_CHECK;
 global $ENABLE_TOKEN_CHECK;
 
 
+
 // Check for logout and maybe display login page
 if ($_GET['action'] == 'logout') {
     $user->logout();
+
     display_login();
     exit();
 }
