@@ -1,0 +1,40 @@
+
+#data-t{
+    width: 800px;
+    font-family:"Fira Code", serif;
+    font-size: 13px;
+    border-collapse:collapse;
+}
+
+#data-t td{
+    border: solid white;
+    border-width: 1px 0;
+    border-collapse: collapse;
+}
+
+/*奇数行*/
+#data-t tr:nth-child(2n+1){
+    background-color: #eeeff2;
+}
+
+/*偶数行*/
+#data-t tr:nth-child(2n){
+    background-color: #dfe1e7;
+}
+
+/*第四列之后文本居中*/
+#data-t td:nth-child(1n+4){
+    text-align: center;
+}
+
+/*表格头*/
+#data-t tr:first-child{
+    background-color: #687291;
+    text-align:left;
+    color: white;
+    font-weight: bolder;
+}
+
+#data-t tr:last-child{
+    visibility: hidden;
+}

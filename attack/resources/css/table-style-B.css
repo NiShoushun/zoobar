@@ -1,0 +1,30 @@
+#data-t {
+    width: 800px;
+    font-family: "Fira Code", "JetBrains Mono", sans-serif;
+    font-size: 13px;
+
+    /*表格边框*/
+    border: 10px solid #d0d0ff;
+    /*边框空白*/
+    padding: 20px;
+
+    border-spacing: 0;
+}
+
+/*第四列之后文本居中*/
+#data-t td:nth-child(1n+4){
+    text-align: center;
+}
+
+/*表格头*/
+#data-t tr:first-child{
+    font-weight: bolder;
+    text-align: left;
+}
+
+/*最后一行*/
+#data-t tr:last-child td{
+
+    font-weight: bolder;
+    border-top: 2px solid black;
+}
