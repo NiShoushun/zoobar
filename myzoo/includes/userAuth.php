@@ -90,7 +90,7 @@ class UserAuth
         $token = md5($values["Password"] . mt_rand());
 
         $this->updateToken($token);
-        // FIXME 这句有用？ 初始化 session ?
+        // 初始化一个 session
         $session = session_id();
         $sql = "UPDATE Person SET Token = '$token' " .
             "WHERE PersonID = $this->id";

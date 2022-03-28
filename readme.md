@@ -23,7 +23,7 @@ web 安全实践实验项目，对其做了一些修改。
 
   > 在php.ini中添加：`extension mysqli`
 
-其他mysql选项被定义在php.ini中的`MySQLi`段中，可自行修改：
+其他mysql选项被定义在php.ini中的 `MySQLi` section中，可自行修改：
 
 ![image-20211226180342034](https://ni187note-pics.oss-cn-hangzhou.aliyuncs.com/notes-img/image-20211226180342034.png)
 
@@ -45,13 +45,15 @@ Server built:   Nov 13 2021 20:10:37
   ```htaccess
   LoadModule mpm_prefork_module modules/mod_mpm_prefork.so
   ```
-  貌似是为每个HTTP连接创建一个进程/线程？
+  为每个HTTP连接创建一个进程；
 
 * 删除模块（注释掉）：
   
   ```htaccess
   LoadModule mpm_event_module modules/mod_mpm_event.so
   ```
+  
+  注释掉是因为 httpd 只能有一个多任务模型模块，而PHP是进程安全，但线程不安全的，无法使用 `event` 模块（以多线程方式创建服务）。
 
 新建配置文件`httpd/conf/myconf/zoobar.conf`：
 
@@ -62,15 +64,15 @@ LoadModule php_module /usr/lib/httpd/modules/libphp.so
 <IfModule ssl_module>
 
     <Directory /files>
-    Options Indexes FollowSymLinks
+        Options Indexes FollowSymLinks
     </Directory>
     
     AddType application/x-httpd-php .php
 
 	# zoobar web服务
-	<VirtualHost niss.com:443>
+	<VirtualHost zoobar.com:443>
 		ServerAdmin nishoushun@ustc.edu
-		ServerName niss.com	
+		ServerName zoobar.com	
 
         # 你的项目目录路径
 		DocumentRoot /public/www/myzoo
@@ -83,28 +85,14 @@ LoadModule php_module /usr/lib/httpd/modules/libphp.so
 		# 日志记录路径
 		ErrorLog  /public/www/myzoo/logs/zoobar_err.log
 		CustomLog /public/www/myzoo/logs/access.log combined
-
-		SSLEngine on
-
-		# 网站证书和私钥地址
-		SSLCertificateFile    /home/niss/.secret/ca/certs/apache/apache_server.crt
-		SSLCertificateKeyFile /home/niss/.secret/ca/certs/apache/serverkey.pem
-
-		<FilesMatch "\.(cgi|shtml|phtml|php)$">
-				SSLOptions +StdEnvVars
-		</FilesMatch>
-		<Directory /usr/lib/cgi-bin>
-				SSLOptions +StdEnvVars
-		</Directory>
-
 	
 	</VirtualHost>
 </IfModule>
 
 	# attack web服务
-	<VirtualHost nissattack.com:80>
+	<VirtualHost attack.com:80>
 		ServerAdmin nishoushun@ustc.edu
-		ServerName nissattack.com	
+		ServerName attack.com	
         DirectoryIndex index.html index.htm index.php
         
         # 你的项目目录路径
@@ -114,11 +102,14 @@ LoadModule php_module /usr/lib/httpd/modules/libphp.so
 		ErrorLog  /public/www/attack/logs/error.log
 		CustomLog /public/www/attack/logs/access.log combined
 	</VirtualHost>
+
 ```
 
-* httpd服务器将以`ServerName`进行区分发送至本地的请求，如果在本地需要修改hosts文件。（其实可以通过端口号区分，只需要添加`listen` 指令，并将对应`VirtualHost`的端口号进行修改即可）。
+> **注意**：httpd 默认以 `httpd` 用户运行，要注意目录访问权限。
 
-将以上配置文件的各项进行相应修改，同时将该配置文件通过`include`指令添加进`/etc/httpd/conf/httpd.conf`中。
+httpd服务器将以 `ServerName` 进行区分发送至本地的请求，如果在本地需要修改hosts文件。（其实可以通过端口号区分，只需要添加 `listen` 指令，并将对应 `VirtualHost` 的端口号进行修改即可）。
+
+将以上配置文件的各项进行相应修改，同时将该配置文件通过 `include` 指令添加进 `/etc/httpd/conf/httpd.conf`中。
 
 > 注意：在某些系统中，php8可能不自带`libphp.so`，需要自行安装，并导入该模块。
 
@@ -136,17 +127,17 @@ LoadModule php_module /usr/lib/httpd/modules/libphp.so
 修改数据库配置变量
 
 ```php
-$DEFAULT_DB_NAME = "your database name";
-$DEFAULT_DB_HOST = "your database server host";
-$DEFAULT_DB_PASSWD = "your database user password";
-$DEFAULT_DB_USER = "database user name";
+$DEFAULT_DB_NAME = "database schema name";
+$DEFAULT_DB_HOST = "database host";
+$DEFAULT_DB_PASSWD = "database password";
+$DEFAULT_DB_USER = "database user";
 ```
 
 ##### 修改tag以及其他不安全字符过滤规则：
 
 修改`includes\config.php`中的 `$allowd_tags` 以及 `$disallowed`，其中：
 
-* `$allowd_tags`：允许出现在zoobar用户界面中的profile中的html tag；
+* `$allowd_tags`：允许出现在zoobar用户界面中的profile中的html 标签；
 * `$disallowd`：不允许出现的字符，会被替换为空格字符：`" "`；
 * `$REPLACE_SPACIAL_CHAR`：若为`true`，则将一些特殊字符转义为`&xx`；
 
@@ -159,8 +150,8 @@ $ENABLE_HTTP_REFER_CHECK = true;
 $ENABLE_TOKEN_CHECK = true;
 ```
 
-* `$ENABLE_HTTP_REFERER_CHECK `：若为true，则检查请求来源是否为`/transfer.php`，不通过验证则php终止服务；
-* `$ENABLE_TOKEN_CHECK `：若为true，用户访问transfer.php时进行token更新，并于用户提交的token相比较（token被写入到用户表单并不可见），不通过验证则php终止服务；
+* `$ENABLE_HTTP_REFERER_CHECK `：若为 `true` ，则检查请求来源是否为 `/transfer.php`，不通过验证则php终止服务；
+* `$ENABLE_TOKEN_CHECK `：若为 `true` ，用户访问 transfer.php 时进行token更新，并于用户提交的token相比较（token被写入到用户表单并不可见），没通过验证则 php 终止服务；
 
 ## 攻击演示
 
@@ -170,7 +161,7 @@ $ENABLE_TOKEN_CHECK = true;
 
 * `xssCookieGetter.html`：用于存储至zoobar用户的profile中，解析为js后，自动向attack服务的`cooker.php`发送一条请求，包含用户的cookie。
 
-* `cooker.php`：接受请求并打印cookie（实际上没用，要获取cookie，只需要查看配置问attack访问日志就可以）：
+* `cooker.php`：接受请求并打印cookie（实际上没用，要获取cookie，只需要查看 attack.com 的访问日志就可以）：
 
   ![image-20211221210534047](https://ni187note-pics.oss-cn-hangzhou.aliyuncs.com/notes-img/image-20211221210534047.png)
 
@@ -180,16 +171,16 @@ $ENABLE_TOKEN_CHECK = true;
 
 > 注意：
 >
-> CSRF攻击演示需要将检查设为`false`：
+> CSRF 攻击演示需要将检查设为 `false`：
 >
 > ```php
 > $ENABLE_HTTP_REFER_CHECK = false;
 > $ENABLE_TOKEN_CHECK = false;
 > ```
 >
-> XSS攻击演示需要将允许的添加一些tag与关键词；
+> XSS 攻击演示需要将允许的添加一些tag与关键词；
 >
-> XSS蠕虫攻击也需要将CSRF检查设为`false`
+> XSS 蠕虫攻击也需要将 CSRF 检查设为 `false`；
 
 ### csrf
 
@@ -210,15 +201,19 @@ hacker 在自己的profile中设置：
 ```js
 const req = new XMLHttpRequest();
 req.withCredentials = true;
-req.open("POST","https://niss.com/transfer.php",false);
+req.open("POST","https://baidu.com",false);
 req.setRequestHeader("Content-type","application/x-www-form-urlencoded");
 req.send("zoobars=1&recipient=hacker&submission=Send");
 alert("YOU WIN");
 ```
 
-但是实际上因为同源策略，httpd服务器会禁止该请求：
+> **注意**：设置 `Content-type` 标头：`application/x-www-form-urlencoded` 与 `mutipart/form-data` 皆可。（不会还有人不知道两者的区别吧😅）
+
+因为同源策略，httpd服务器会禁止该请求：
 
 ![image-20211226182846492](https://ni187note-pics.oss-cn-hangzhou.aliyuncs.com/notes-img/image-20211226182846492.png)
+
+[浏览器的同源策略](https://developer.mozilla.org/zh-CN/docs/Web/Security/Same-origin_policy)
 
 所以需要通过提交表单的方式完成本次攻击：
 
@@ -254,11 +249,11 @@ alert("YOU WIN");
 127.0.0.1 - - [26/Dec/2021:18:40:53 +0800] "POST /transfer.php HTTP/1.1" 200 1874 "https://niss.com/transfer.php" "Mozilla/5.0 (X11; Linux x86_64; rv:95.0) Gecko/20100101 Firefox/95.0"
 ```
 
-php可以使用http_referer获取请求来源页面，判定是否为`/transfer.php`，如果不是在停止服务。
+php可以使用http_referer获取请求来源页面，判定是否为 `/transfer.php`，如果不是则停止服务。
 
-> http referer 值被保存在http请求报文头中的 `Referer` 字段中
+> **注**：http referer 值被保存在http请求报文头中的 `Referer` 字段中
 
-demo：
+**demo**：
 
 ```php
 function checkHttpReferer(){
@@ -274,7 +269,7 @@ function checkHttpReferer(){
 }
 ```
 
-但是HTTP_REFERER可以被轻松修改，例如使用bp抓取报文，可以轻松修改该值：
+但是 HTTP_REFERER 可以被轻松修改，例如使用bp抓取报文，可以轻松修改该值：
 
 ![image-20211226184959116](https://ni187note-pics.oss-cn-hangzhou.aliyuncs.com/notes-img/image-20211226184959116.png)
 
@@ -307,7 +302,7 @@ function checkHttpReferer(){
 
 抵御CSRF的办法一般就是找一个只有正常用户知道并可以提交，而hacker是无法得之的值。
 
-每次用户等录页面时，可以生成一个随机值转为token，并保存之session中；之后用户每访问`transfer.php`页面，则在表单中自动填入token，并一并发送至服务端，而其他人无法得知该token，也就无法自动提交token信息来完成认证。
+每次用户等录页面时，可以生成一个随机值转为token，并保存之session中；之后用户每访问 `transfer.php` 页面，则在表单中自动填入token，并一并发送至服务端，而其他人无法得知该token，也就无法自动提交token信息来完成认证。
 
 > 注意：每次用户logout后要销毁session，防止每次login都用的同一个token
 >
@@ -376,24 +371,46 @@ xsser将以下代码存储在profile中：
 
 #### 防御
 
+##### 针对  Cookie 窃取
+
+当服务端响应报文中的 `Set-Cookie` 标头包含 `httponly` 时，它是不能被 `document.cookie` 所获取的，而zoobar 中貌似只有设置 `PHPSESSION` 时，用到了 `Cookie` ，所以可以在配置文件中添加：
+
+```ini
+ session.cookie_httponly = 1
+```
+
+或者在代码中添加：
+
+```php
+ini_set("session.cookie_httponly", 1);
+```
+
+来让存储 SESSION ID 的 Cookie 添加上 `httponly` 属性。 
+
+如果涉及到cookie的设置：，可以参考：https://secure.php.net/manual/en/function.setcookie.php
+
+##### 针对关键词的替换
+
 在输出html时，仅使用信任的tag，对一些可能有威胁的标tag符或标签进行替换。
 
-> 比如使用 `&lt` 替换 `<`
+> 比如使用 `&lt;` 替换 `<`
 
-demo：
+**demo**：
 
 ```php
 $profile = preg_replace("/</i", "&lt", $profile);
 $profile = preg_replace("/>/i", "&gt", $profile);
 ```
 
-> 其实php中提供了该功能函数 `htmlentities($string)`
->
-> 该函数将特殊字符转义为普通字符，从而并不会被浏览器解析为tag
+其实php中提供了该功能函数 `htmlentities($string)`，该函数将特殊字符转义为实体字符，从而并不会被浏览器解析为tag 。
 
 ![image-20211226200748929](https://ni187note-pics.oss-cn-hangzhou.aliyuncs.com/notes-img/image-20211226200748929.png)
 
+> **注**：字符转移总是应该在输出时进行。
+
 具体代码改动看：`users.php`
+
+##### 黑\白名单
 
 ### 点击劫持
 
@@ -413,13 +430,13 @@ hijacker在自己的profile中添加：
 
 用户只需要向`win`的位置进行点击，即用户自己点击了send按钮。
 
-> 但实际上表单中并没有内容，此次攻击无效🙃🙃🙃🙃🙃
+> 但实际上表单中并没有内容，此次攻击无效🙃🙃🙃🙃🙃，要自己去慢慢调整网页...
 
 #### 防御
 
 ##### X-Frame-Options
 
-The **`X-Frame-Options`** [HTTP](https://developer.mozilla.org/en-US/docs/Web/HTTP) 响应头是用来给浏览器 指示允许一个页面可否在`<frame>`，`<iframe>` ，`<embed>`，`<object>`，中展现的标记。站点可以通过确保网站没有被嵌入到别人的站点里面，从而避免clickjacking 攻击。
+The **`X-Frame-Options`** HTTP 响应头是用来给浏览器 指示允许一个页面可否在`<frame>`，`<iframe>` ，`<embed>`，`<object>`，中展现的标记。站点可以通过确保网站没有被嵌入到别人的站点里面，从而避免 clickjacking 攻击。
 
 `X-Frame-Options` 有三个可能的值：
 
@@ -434,8 +451,6 @@ X-Frame-Options: deny
 X-Frame-Options: sameorigin
 X-Frame-Options: allow-from https://example.com/
 ```
-
-> 说到底还是得用户自觉一点儿。
 
 检查httpd配置中是否包含headers模块，没有就导入进来：
 
@@ -453,4 +468,4 @@ LoadModule headers_module modules/mod_headers.so
 
 ![image-20211226210721233](https://ni187note-pics.oss-cn-hangzhou.aliyuncs.com/notes-img/image-20211226210721233.png)
 
-关于X-Frame-Options可以参考[X-Frame-Options](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/X-Frame-Options)
+关于X-Frame-Options可以参考 [X-Frame-Options](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/X-Frame-Options)
