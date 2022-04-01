@@ -219,9 +219,9 @@ alert("YOU WIN");
 
 浏览器会提示 `attack.com` 的 `Access-Control-Allow-Origin` 标头缺失，不允许读取 `zoobar.com` 的资源。
 
-也就是说要访问的网站需要在响应头部加上 `Access-Control-Allow-Origin` 标头，来告知浏览器是否可以加载 `zoobar.com` 的资源。
+也就是说要访问的网站（attack）需要在响应头部加上 `Access-Control-Allow-Origin` 标头，来告知浏览器是否可以加载 `zoobar.com` 的资源。
 
-可以通过 `*` 来进行模糊匹配，例如下面的标头，都可以通知浏览器允许在 `zoobar` 域下发起对 `attack` 的请求 ：
+可以通过 `*` 来进行模糊匹配，例如下面的标头，都可以通知浏览器允许在 `attack` 域下发起对 `zoobar` 域的请求 ：
 
 * `Access-Control-Allow-Origin:http://zoobar.com`
 * `Access-Control-Allow-Origin:*`
